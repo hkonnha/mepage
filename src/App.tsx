@@ -224,7 +224,7 @@ export default function App() {
                   dolor.
                 </h2>
                 <p className="big">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit!
                 </p>
               </div>
             </div>

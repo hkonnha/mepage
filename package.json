@@ -1,5 +1,6 @@
 {
   "name": "port",
+  "homepage": "https://hkonnha.github.io/mepage",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
