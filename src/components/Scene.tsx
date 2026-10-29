@@ -4,6 +4,8 @@ import { sceneState } from '../sceneState';
 
 /** Radians of head turn per pixel of mouse movement while grabbed. */
 const DRAG_SENSITIVITY = 0.005;
+/** Multiplier on release speed so a flick keeps him spinning for a while. */
+const FLING_BOOST = 1.6;
 const CAMERA_Z = 8;
 const PIXEL = 4; // render resolution divisor: chunky PS1-style pixels
 const IDLE_SLEEP_SECONDS = 12;
@@ -295,6 +297,7 @@ export default function Scene() {
       return raycaster.intersectObject(head.group, true).length > 0;
     };
     const last = { x: 0, y: 0 };
+    let lastMoveAt = 0;
     const onPointerMove = (e: PointerEvent) => {
       poke();
       mouse.x = e.clientX / window.innerWidth;
@@ -313,7 +316,16 @@ export default function Scene() {
           -1.2,
           1.2,
         );
-        drag.vel = dx * DRAG_SENSITIVITY;
+        // Fling speed in radians per 60fps frame, smoothed over a few events
+        // so one stray tiny delta at release can't kill the momentum.
+        const dt = Math.max(e.timeStamp - lastMoveAt, 4);
+        lastMoveAt = e.timeStamp;
+        const inst = dx * DRAG_SENSITIVITY * (16.7 / dt) * FLING_BOOST;
+        drag.vel = THREE.MathUtils.clamp(
+          drag.vel * 0.4 + inst * 0.6,
+          -0.8,
+          0.8,
+        );
         dizzyAcc += Math.abs(dx) * DRAG_SENSITIVITY;
       } else {
         html.classList.toggle('over-head', hitsHead(e.clientX, e.clientY));
@@ -328,6 +340,7 @@ export default function Scene() {
       e.preventDefault(); // no text selection while dragging
       drag.active = true;
       drag.vel = 0;
+      lastMoveAt = e.timeStamp;
       last.x = e.clientX;
       last.y = e.clientY;
       // Lock the mouse so it can't wander off or jump when released. Touch
@@ -343,7 +356,9 @@ export default function Scene() {
     const onTouchMove = (e: TouchEvent) => {
       if (drag.active && e.cancelable) e.preventDefault();
     };
-    const onPointerUp = () => {
+    const onPointerUp = (e: PointerEvent) => {
+      // Holding still before letting go means a drop, not a fling.
+      if (e.timeStamp - lastMoveAt > 80) drag.vel = 0;
       drag.active = false;
       if (document.pointerLockElement) document.exitPointerLock();
     };
@@ -393,10 +408,13 @@ export default function Scene() {
       if (!drag.active) {
         drag.yaw += drag.vel;
         dizzyAcc += Math.abs(drag.vel);
-        drag.vel *= 0.93;
-        // Unwind whole turns so it eases back the short way round.
+        drag.vel *= 0.975;
+        if (Math.abs(drag.vel) < 0.0005) drag.vel = 0;
+        // Unwind whole turns so it eases back the short way round, but only
+        // pull back to centre once the spin has slowed down.
         drag.yaw -= Math.round(drag.yaw / (Math.PI * 2)) * Math.PI * 2;
-        drag.yaw *= 0.95;
+        const spinning = clamp(Math.abs(drag.vel) / 0.03, 0, 1);
+        drag.yaw *= 1 - 0.05 * (1 - spinning);
         drag.pitch *= 0.92;
       }
       html.classList.toggle('grabbing', drag.active);
