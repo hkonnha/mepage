@@ -16,6 +16,17 @@
 
 html {
   background: var(--bg);
+  /* no pull-to-refresh or rubber-banding on touch */
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* No text selection or iOS callout while the head is being dragged. */
+html.grabbing {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 body {
