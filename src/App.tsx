@@ -1,6 +1,6 @@
 import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 import Boot from './components/Boot';
-import ContactTerminal from './components/ContactTerminal';
+import ContactTerminal, { EMAIL } from './components/ContactTerminal';
 import CrtToggle from './components/CrtToggle';
 import Cursor from './components/Cursor';
 import Nav, { NavItem } from './components/Nav';
@@ -18,10 +18,9 @@ const ITEMS: NavItem[] = [
 ];
 
 const PROJECTS = [
-  { name: 'Project One', tag: 'WebGL / 2026' },
-  { name: 'Project Two', tag: 'Design system / 2025' },
-  { name: 'Project Three', tag: 'Interactive / 2025' },
-  { name: 'Project Four', tag: 'Tooling / 2024' },
+  { name: 'Project TBD', tag: 'coming soon' },
+  { name: 'Project TBD', tag: 'coming soon' },
+  { name: 'Project TBD', tag: 'coming soon' },
 ];
 
 const SKILLS = [
@@ -59,7 +58,7 @@ export default function App() {
     setBooting(false);
   }, []);
 
-  // Scroll-linked effects: the hero transition, the marquee and the head riding out with the hero.
+  // Scroll-linked effects: the hero transition and the head riding out with the hero.
   useEffect(() => {
     const el = root.current!;
     const home = el.querySelector<HTMLElement>('#home')!;
@@ -69,8 +68,6 @@ export default function App() {
     const panelItems = Array.from(
       el.querySelectorAll<HTMLElement>('.panel-text > *'),
     );
-    const marquee = el.querySelector<HTMLElement>('.marquee')!;
-    const track = el.querySelector<HTMLElement>('.marquee-track')!;
 
     let frame = 0;
     const update = () => {
@@ -94,11 +91,6 @@ export default function App() {
 
       // Once the hero unpins it scrolls away; the head rides up with it.
       sceneState.lift = clamp((vh - h.bottom) / vh, 0, 2);
-
-      // Marquee slides sideways while it crosses the screen.
-      const m = marquee.getBoundingClientRect();
-      const r = clamp((vh - m.top) / (vh + m.height));
-      track.style.transform = `translateX(${-50 * r}%)`;
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -189,9 +181,6 @@ export default function App() {
       {booting && <Boot onDone={finishBoot} />}
       <Scene />
       <CrtToggle />
-      <div className="construction-bar" role="status">
-        <span>⚠ Under construction ⚠</span>
-      </div>
       <div className="scanlines" aria-hidden />
       <div className="crt-roll" aria-hidden />
       <div className="crt-frame" aria-hidden />
@@ -202,16 +191,16 @@ export default function App() {
         <section id="home" className="hero">
           <div className="hero-sticky">
             <div className="hero-slide">
-              <p className="eyebrow">&gt; portfolio.exe</p>
+              <p className="eyebrow">&gt; hakon.exe</p>
               <h1 className="hero-title">
                 <span className="hero-line" style={stagger(0)}>
-                  <span>Lorem</span>
+                  <span>Håkon</span>
                 </span>
                 <span className="hero-line" style={stagger(1)}>
-                  <span>Ipsum</span>
+                  <span>Nikolai</span>
                 </span>
                 <span className="hero-line outline" style={stagger(2)}>
-                  <span>Dolor.</span>
+                  <span>Haagaas</span>
                 </span>
               </h1>
               <p className="scroll-hint">SCROLL ▼</p>
@@ -220,43 +209,36 @@ export default function App() {
               <div className="panel-text">
                 <p className="eyebrow">&gt; 01 / intro</p>
                 <h2>
-                  Lorem
+                  Hi, I&apos;m
                   <br />
-                  ipsum
-                  <br />
-                  dolor.
+                  Håkon.
                 </h2>
                 <p className="big">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit!
+                  I make things on the internet. This is where they live.
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="marquee" aria-hidden>
-          <div className="marquee-track">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <span key={i}>LOREM IPSUM ✶ DOLOR SIT ✶ </span>
-            ))}
-          </div>
-        </div>
-
         <section id="about" className="section">
           <h2 className="reveal">About</h2>
           <p className="big reveal">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore.
+            No pitch here. I built this because it was fun, and so my projects
+            have one place to live.
           </p>
         </section>
 
         <section id="work" className="section">
           <h2 className="reveal">Work</h2>
+          <p className="work-note reveal">
+            Nothing here yet. Projects show up as I finish them.
+          </p>
           <ul className="projects">
             {PROJECTS.map((p, i) => (
               <li
-                key={p.name}
-                className="project reveal reveal-left"
+                key={i}
+                className="project tbd reveal reveal-left"
                 style={stagger(i)}
                 data-hover
               >
@@ -289,8 +271,8 @@ export default function App() {
           <div className="reveal">
             <ContactTerminal />
           </div>
-          <a className="mail-link" href="mailto:you@example.com">
-            or just email you@example.com →
+          <a className="mail-link" href={`mailto:${EMAIL}`}>
+            or just email {EMAIL} →
           </a>
         </section>
       </main>
