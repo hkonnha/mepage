@@ -1,13 +1,44 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --bg: #0a0a0a;
+  --fg: #f2f2f2;
+  --dim: #858585;
+  --accent: #f2f2f2;
+  --line: #2a2a2a;
+  --font-display: 'Arial Black', 'Helvetica Neue', Impact, sans-serif;
+  --font-mono: 'Courier New', ui-monospace, monospace;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  line-height: 1.5;
+  -webkit-font-smoothing: none;
+  /* faint RGB fringing, like a slightly misconverged CRT */
+  text-shadow:
+    0.6px 0 rgba(255, 40, 80, 0.35),
+    -0.6px 0 rgba(40, 220, 255, 0.3);
+  overflow-x: hidden;
+}
+
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
 }
