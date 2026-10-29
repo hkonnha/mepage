@@ -189,6 +189,9 @@ export default function App() {
       {booting && <Boot onDone={finishBoot} />}
       <Scene />
       <CrtToggle />
+      <div className="construction-bar" role="status">
+        <span>⚠ Under construction ⚠</span>
+      </div>
       <div className="scanlines" aria-hidden />
       <div className="crt-roll" aria-hidden />
       <div className="crt-frame" aria-hidden />

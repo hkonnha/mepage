@@ -220,6 +220,7 @@ main {
 }
 .section {
   min-height: 100vh;
+  min-height: 100svh; /* stable under mobile URL bars */
   padding: 7rem 2rem 4rem;
   max-width: 1400px;
   margin: 0 auto;
@@ -245,11 +246,13 @@ h2 {
 .hero {
   position: relative;
   height: 220vh; /* 100vh pinned view + 120vh of scroll for the transition */
+  height: 220svh;
 }
 .hero-sticky {
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100svh;
   overflow: hidden;
 }
 .hero-slide,
@@ -394,6 +397,18 @@ h2 {
     width: 100%;
     justify-content: space-between;
   }
+  .section {
+    padding: 6rem 1.25rem 3rem;
+  }
+}
+
+/* Touch: bigger tap target for the CRT toggle, clear of the home bar. */
+@media (pointer: coarse) {
+  .crt-toggle {
+    padding: 0.7rem 1rem;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: calc(16px + var(--bar-h) + env(safe-area-inset-bottom));
+  }
 }
 
 /* Scroll reveals: .in is added by an IntersectionObserver. */
@@ -437,10 +452,43 @@ h2 {
 .crt-off body {
   text-shadow: none;
 }
+/* Under-construction banner: hazard stripes with a black label plate. */
+:root {
+  --bar-h: 1.75rem;
+}
+.construction-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 44;
+  height: calc(var(--bar-h) + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: repeating-linear-gradient(-45deg, #f5c400 0 14px, #111 14px 28px);
+  border-top: 3px solid #111;
+  pointer-events: none;
+}
+.construction-bar span {
+  height: calc(var(--bar-h) - 3px);
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  background: #111;
+  color: #f5c400;
+  font: 900 0.75rem var(--font-display);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+main {
+  padding-bottom: var(--bar-h);
+}
 .crt-toggle {
   position: fixed;
   right: 28px;
-  bottom: 24px;
+  bottom: calc(24px + var(--bar-h));
   z-index: 45;
   padding: 0.35rem 0.6rem;
   background: #000;

@@ -232,9 +232,16 @@ export default function Scene() {
     pivot.add(head.group);
     world.add(pivot);
 
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    let sized = { w: 0, h: 0 };
     const resize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      // Mobile URL bars resize the viewport while scrolling; don't rebuild
+      // the canvas for that, only for real width or orientation changes.
+      const urlBarOnly = w === sized.w && Math.abs(h - sized.h) < 150;
+      if (coarse && urlBarOnly) return;
+      sized = { w, h };
       const cw = Math.ceil(w / PIXEL);
       const ch = Math.ceil(h / PIXEL);
       renderer.setSize(cw, ch, false);
@@ -287,14 +294,19 @@ export default function Scene() {
       );
       return raycaster.intersectObject(head.group, true).length > 0;
     };
+    const last = { x: 0, y: 0 };
     const onPointerMove = (e: PointerEvent) => {
       poke();
       mouse.x = e.clientX / window.innerWidth;
       mouse.y = e.clientY / window.innerHeight;
       if (drag.active) {
-        // movementX/Y keep working while the pointer is locked.
-        const dx = e.movementX;
-        const dy = e.movementY;
+        // movementX/Y keep working while the pointer is locked; touch and
+        // unlocked pointers report unreliable movement, so use the delta.
+        const locked = !!document.pointerLockElement;
+        const dx = locked ? e.movementX : e.clientX - last.x;
+        const dy = locked ? e.movementY : e.clientY - last.y;
+        last.x = e.clientX;
+        last.y = e.clientY;
         drag.yaw += dx * DRAG_SENSITIVITY;
         drag.pitch = THREE.MathUtils.clamp(
           drag.pitch + dy * DRAG_SENSITIVITY,
@@ -316,12 +328,20 @@ export default function Scene() {
       e.preventDefault(); // no text selection while dragging
       drag.active = true;
       drag.vel = 0;
-      // Capture the pointer so it can't wander off or jump when released.
+      last.x = e.clientX;
+      last.y = e.clientY;
+      // Lock the mouse so it can't wander off or jump when released. Touch
+      // has no cursor to lock; it is held by touchmove below instead.
+      if (e.pointerType !== 'mouse') return;
       try {
         Promise.resolve(html.requestPointerLock()).catch(() => {});
       } catch {
         /* dragging still works without the lock */
       }
+    };
+    // While the head is held, stop the page scrolling or pull-to-refreshing.
+    const onTouchMove = (e: TouchEvent) => {
+      if (drag.active && e.cancelable) e.preventDefault();
     };
     const onPointerUp = () => {
       drag.active = false;
@@ -336,6 +356,7 @@ export default function Scene() {
     window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointerup', onPointerUp);
     window.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
     document.addEventListener('pointerlockchange', onLockChange);
 
     const halfHeight = Math.tan(THREE.MathUtils.degToRad(25)) * CAMERA_Z;
@@ -442,6 +463,7 @@ export default function Scene() {
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
+      window.removeEventListener('touchmove', onTouchMove);
       document.removeEventListener('pointerlockchange', onLockChange);
       if (document.pointerLockElement) document.exitPointerLock();
       html.classList.remove('over-head', 'grabbing');
