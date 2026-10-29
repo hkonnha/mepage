@@ -1,6 +1,6 @@
 import { FormEvent, useRef, useState } from 'react';
 
-const EMAIL = 'you@example.com';
+export const EMAIL = 'hkonnhaagaas@gmail.com';
 
 const FIELDS = [
   { key: 'name', label: 'name' },

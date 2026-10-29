@@ -293,6 +293,9 @@ h2 {
 .hero-line {
   display: block;
   overflow: hidden;
+  /* headroom so the ring on Å isn't clipped; the margin keeps the spacing */
+  padding-top: 0.2em;
+  margin-top: -0.2em;
 }
 .hero-line span {
   display: block;
@@ -319,21 +322,6 @@ h2 {
   font-size: 0.8rem;
 }
 
-.marquee {
-  overflow: hidden;
-  background: var(--accent);
-  color: var(--bg);
-  border-block: 4px solid var(--bg);
-  font: 900 2rem var(--font-display);
-  white-space: nowrap;
-  padding: 0.5rem 0;
-  position: relative;
-  z-index: 10;
-}
-.marquee-track {
-  display: inline-block;
-}
-
 .projects {
   list-style: none;
 }
@@ -357,6 +345,15 @@ h2 {
 .project .num,
 .project .tag {
   font: 400 0.9rem var(--font-mono);
+  color: var(--dim);
+}
+/* Placeholder rows: dimmed, with a dashed rule, until real projects exist. */
+.project.tbd {
+  color: var(--dim);
+  border-top-style: dashed;
+}
+.work-note {
+  margin-bottom: 1.5rem;
   color: var(--dim);
 }
 
@@ -407,7 +404,7 @@ h2 {
   .crt-toggle {
     padding: 0.7rem 1rem;
     right: max(16px, env(safe-area-inset-right));
-    bottom: calc(16px + var(--bar-h) + env(safe-area-inset-bottom));
+    bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
 
@@ -452,43 +449,10 @@ h2 {
 .crt-off body {
   text-shadow: none;
 }
-/* Under-construction banner: hazard stripes with a black label plate. */
-:root {
-  --bar-h: 1.75rem;
-}
-.construction-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 44;
-  height: calc(var(--bar-h) + env(safe-area-inset-bottom));
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  background: repeating-linear-gradient(-45deg, #f5c400 0 14px, #111 14px 28px);
-  border-top: 3px solid #111;
-  pointer-events: none;
-}
-.construction-bar span {
-  height: calc(var(--bar-h) - 3px);
-  padding: 0 1rem;
-  display: flex;
-  align-items: center;
-  background: #111;
-  color: #f5c400;
-  font: 900 0.75rem var(--font-display);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-main {
-  padding-bottom: var(--bar-h);
-}
 .crt-toggle {
   position: fixed;
   right: 28px;
-  bottom: calc(24px + var(--bar-h));
+  bottom: 24px;
   z-index: 45;
   padding: 0.35rem 0.6rem;
   background: #000;
